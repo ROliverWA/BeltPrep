@@ -39,7 +39,9 @@ td {
     </tr>
 @foreach (Activity activity in Model)
 {
-
+   if (activity.Date > DateTime.Now)
+    {
+    
     <tr>
         <td><a href="/activity/@activity.ActivityId">@activity.Title</a></td>
         <!-- DATE AND TIME -->
@@ -64,6 +66,7 @@ td {
             <td><a href="/join/@activity.ActivityId">Join</a></td>
         }
     </tr>
+}
 }
 </table>
 <br>

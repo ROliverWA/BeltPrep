@@ -152,13 +152,15 @@ namespace Exam.Controllers
           return View("CreateActivity");
         }       
 
-        int? idUser = HttpContext.Session.GetInt32("LoggedID");
+        int? idUser = HttpContext.Session.GetInt32("LoggedID");        
         DateTime activityDay = form.Date;
         TimeSpan activityTime = form.Time;
         newActivity.Date = activityDay + activityTime;
         newActivity.UserId = (int)idUser;
         string HMD = form.HMD;
-        newActivity.Duration = form.Duration + " " + HMD;
+        string dur = form.Duration.ToString();
+        newActivity.Duration =  dur + " " + HMD;
+        
         dbContext.Add(newActivity);
         dbContext.SaveChanges();
         // SELECTING ADDED Activity ID
@@ -187,52 +189,38 @@ namespace Exam.Controllers
       return View("Index");
     }
 
+
     [HttpGet("join/{activityID}")]
     public IActionResult AddParticipant(int activityID)
     {
       if (HttpContext.Session.GetInt32("LoggedID") != null)
       {
-        int? idUser = HttpContext.Session.GetInt32("LoggedID");
-          
-       
-      
-        List<Activity> allActivities = dbContext.Activities.Include(p => p.Participants).ToList();
-        Activity thisAct = dbContext.Activities.FirstOrDefault(a => a.ActivityId == activityID);
+        float bookedtime;
         
-        foreach(Activity a in allActivities) {
-          foreach(Participant u in a.Participants)
-          {
-            if (u.UserId == HttpContext.Session.GetInt32("LoggedID"))
-            {
-              
-              if(a.Date.Hour >=  thisAct.Date.Hour) {
-                Console.WriteLine("No");
-                
-                
-              }
-              else if (a.Date.Hour + a.Duration != thisAct.Date.Hour + a.Duration){
+        int? idUser = HttpContext.Session.GetInt32("LoggedID");   
+
+       
                 Participant newParticipant = new Participant();
                 newParticipant.UserId = (int)idUser;
                 newParticipant.ActivityId = activityID;
                 dbContext.Add(newParticipant);
                 dbContext.SaveChanges();
                 return RedirectToAction("Home");
-              }
-            }
-            
-          }
-          
-          
-        }
-        
+                          
+             
+          }             
+                
           
             
-        
-      }
       ModelState.AddModelError("lEmail", "Please login to continue.");
       return View("Index");
+    
     }
       
+    
+
+
+
 
     [HttpGet("leave/{activityID}")]
     public IActionResult RemoveGuest(int activityID)
