@@ -150,7 +150,8 @@ namespace Exam.Controllers
         {
           ModelState.AddModelError("Date", "Must create an activity for a future date.");
           return View("CreateActivity");
-        }
+        }       
+
         int? idUser = HttpContext.Session.GetInt32("LoggedID");
         DateTime activityDay = form.Date;
         TimeSpan activityTime = form.Time;
@@ -192,16 +193,46 @@ namespace Exam.Controllers
       if (HttpContext.Session.GetInt32("LoggedID") != null)
       {
         int? idUser = HttpContext.Session.GetInt32("LoggedID");
-        Participant newParticipant = new Participant();
-        newParticipant.UserId = (int)idUser;
-        newParticipant.ActivityId = activityID;
-        dbContext.Add(newParticipant);
-        dbContext.SaveChanges();
-        return RedirectToAction("Home");
+          
+       
+      
+        List<Activity> allActivities = dbContext.Activities.Include(p => p.Participants).ToList();
+        Activity thisAct = dbContext.Activities.FirstOrDefault(a => a.ActivityId == activityID);
+        
+        foreach(Activity a in allActivities) {
+          foreach(Participant u in a.Participants)
+          {
+            if (u.UserId == HttpContext.Session.GetInt32("LoggedID"))
+            {
+              
+              if(a.Date.Hour >=  thisAct.Date.Hour) {
+                Console.WriteLine("No");
+                
+                
+              }
+              else if (a.Date.Hour + a.Duration != thisAct.Date.Hour + a.Duration){
+                Participant newParticipant = new Participant();
+                newParticipant.UserId = (int)idUser;
+                newParticipant.ActivityId = activityID;
+                dbContext.Add(newParticipant);
+                dbContext.SaveChanges();
+                return RedirectToAction("Home");
+              }
+            }
+            
+          }
+          
+          
+        }
+        
+          
+            
+        
       }
       ModelState.AddModelError("lEmail", "Please login to continue.");
       return View("Index");
     }
+      
 
     [HttpGet("leave/{activityID}")]
     public IActionResult RemoveGuest(int activityID)

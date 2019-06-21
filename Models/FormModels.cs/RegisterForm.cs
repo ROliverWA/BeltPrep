@@ -18,7 +18,7 @@ namespace Exam.Models
         public string Email {get;set;}
 
         [Required(ErrorMessage = "Password needs to be at least 8 characters.")]
-        // [RegularExpression("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z][0-9]@$-_!%*?&]{8,}", ErrorMessage="Password must contain: At least 8 char, 1 number, 1 letter, 1 special char")]
+        [RegularExpression("^.*(?=.{8,})(?=.*[0-9])(?=.*[!@#$%^*_]).*$", ErrorMessage=("Got it?"))]
         [MinLength(8)]
         [DataType(DataType.Password)]
         public string Password {get;set;}
